@@ -2,7 +2,9 @@
 
 import sys
 
-compendium = {}
+compendium = {
+	'all': {},
+}
 opencc_json_template = """
 {
   "name": "XXX IVD collection",
@@ -10,13 +12,13 @@ opencc_json_template = """
     "type": "mmseg",
     "dict": {
       "type": "text",
-      "file": "XXX.txt"
+      "file": "IVD-XXX.txt"
     }
   },
   "conversion_chain": [{
     "dict": {
       "type": "text",
-      "file": "XXX.txt"
+      "file": "IVD-XXX.txt"
     }
   }]
 }
@@ -39,12 +41,18 @@ with open(sys.argv[1], 'r') as file:
 		if not ch_seq[0] in compendium[collection_name]:
 			compendium[collection_name][ch_seq[0]] = []
 
+		if not ch_seq[0] in compendium['all']:
+			compendium['all'][ch_seq[0]] = []
+
 		compendium[collection_name][ch_seq[0]].append(''.join(ch_seq))
 
+		if not ''.join(ch_seq) in compendium['all'][ch_seq[0]]:
+			compendium['all'][ch_seq[0]].append(''.join(ch_seq))
+
 for collection_name in compendium:
-	with open(collection_name + '.json', 'w') as file:
+	with open('IVD-' + collection_name + '.json', 'w') as file:
 		file.write(opencc_json_template.replace('XXX', collection_name))
 
-	with open(collection_name + '.txt', 'w') as file:
+	with open('IVD-' + collection_name + '.txt', 'w') as file:
 		for ch_seiji in compendium[collection_name]:
 			file.write(ch_seiji + '\t' + ' '.join([ch_seiji] + compendium[collection_name][ch_seiji]) + '\n')
